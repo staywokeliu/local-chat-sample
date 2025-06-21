@@ -1,36 +1,57 @@
 <!-- templates/chat.html -->
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>WebSocket Chat</title>
+  <meta charset="UTF-8">
+  <title>FastAPI Chat</title>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-    <h1>Chat Room</h1>
-    <textarea id="chat" cols="50" rows="10" readonly></textarea><br>
-    <input id="msg" type="text" placeholder="Type a message..." autofocus>
-    <button onclick="sendMessage()">Send</button>
+<body class="bg-gray-100 text-gray-900 flex items-center justify-center h-screen">
+  <div class="w-full max-w-xl mx-auto bg-white rounded-lg shadow-lg p-6 flex flex-col h-[90vh]">
+    <h1 class="text-2xl font-bold mb-4 text-center">💬 FastAPI WebSocket Chat</h1>
 
-    <script>
-        const chatBox = document.getElementById("chat");
-        const msgInput = document.getElementById("msg");
-        const ws = new WebSocket(`ws://${location.host}/ws`);
+    <!-- Chat messages -->
+    <div id="chat" class="flex-1 overflow-y-auto border border-gray-300 rounded p-4 mb-4 bg-gray-50 text-sm space-y-2">
+      <!-- 动态内容插入 -->
+    </div>
 
-        ws.onmessage = (event) => {
-            chatBox.value += "\nFriend: " + event.data;
-        };
+    <!-- Input -->
+    <div class="flex space-x-2">
+      <input id="msg" type="text" placeholder="Type a message..." class="flex-1 border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:border-blue-300" autofocus>
+      <button onclick="sendMessage()" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Send</button>
+    </div>
+  </div>
 
-        function sendMessage() {
-            const msg = msgInput.value;
-            chatBox.value += "\nYou: " + msg;
-            ws.send(msg);
-            msgInput.value = '';
-        }
+  <script>
+    const ws = new WebSocket(`ws://${location.host}/ws`);
+    const chatBox = document.getElementById("chat");
+    const msgInput = document.getElementById("msg");
 
-        msgInput.addEventListener("keydown", function(event) {
-            if (event.key === "Enter") {
-                sendMessage();
-            }
-        });
-    </script>
+    ws.onmessage = (event) => {
+      const msg = document.createElement("div");
+      msg.className = "text-left text-gray-700 bg-white px-3 py-2 rounded shadow";
+      msg.textContent = "👤 Friend: " + event.data;
+      chatBox.appendChild(msg);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    };
+
+    function sendMessage() {
+      const msg = msgInput.value.trim();
+      if (msg === "") return;
+      const selfMsg = document.createElement("div");
+      selfMsg.className = "text-right text-blue-700 bg-blue-100 px-3 py-2 rounded shadow";
+      selfMsg.textContent = "🧑 You: " + msg;
+      chatBox.appendChild(selfMsg);
+      ws.send(msg);
+      msgInput.value = "";
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    msgInput.addEventListener("keydown", function(event) {
+      if (event.key === "Enter") {
+        sendMessage();
+      }
+    });
+  </script>
 </body>
 </html>
