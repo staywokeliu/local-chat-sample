@@ -51,7 +51,7 @@ import boto3
 import json
 import os
 
-bedrock = boto3.client("bedrock-runtime", region_name="us-east-1")
+bedrock = boto3.client("bedrock-runtime", region_name="ap-northeast-1")
 
 def lambda_handler(event, context):
     connection_id = event['requestContext']['connectionId']
